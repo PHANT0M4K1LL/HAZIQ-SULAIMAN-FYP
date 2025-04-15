@@ -1,0 +1,84 @@
+<!-- Modern Professional Footer Section for MyTuition Test Platform -->
+<footer class="footer py-5 text-white" style="background:linear-gradient(135deg,rgb(22, 23, 24),rgb(67, 13, 167)); position: relative; overflow: hidden;">
+    <div class="container">
+        <div class="row text-center text-md-start">
+            <!-- About Section -->
+            <div class="col-md-4 mb-4">
+                <h5 class="fw-bold mb-3">About Us</h5>
+                <p class="small">MyTuition provides integrated dashboard, efficient management modules, and a secure payment management system for lecturers and students.</p>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="col-md-3 mb-4">
+                <h5 class="fw-bold mb-3 text-warning">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'Home' %}" class="footer-link text-light">Home</a></li>
+                    <li><a href="{% url 'About_Us' %}" class="footer-link text-light">About Us</a></li>
+                    <li><a href="{% url 'Services' %}" class="footer-link text-light">Services</a></li>
+                    <li><a href="{% url 'Contact_Us' %}" class="footer-link text-light">Contact</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-md-3 mb-4">
+                <h5 class="fw-bold mb-3">Get in Touch</h5>
+                <ul class="list-unstyled small">
+                    <li>Email: <a href="mailto:mytuition@gmail.com" class="footer-link">mytuition@gmail.com</a></li>
+                    <li>Phone: +6016 366 1281</li>
+                </ul>
+            </div>
+            
+            <!-- Social Media -->
+            <div class="col-md-2 mb-4 text-md-end">
+                <h5 class="fw-bold mb-3">Follow Us</h5>
+                <div class="d-flex justify-content-center justify-content-md-end">
+                    <a href="#" class="social-link bg-primary text-white p-2 rounded-circle me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-link bg-info text-white p-2 rounded-circle me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="social-link bg-danger text-white p-2 rounded-circle me-2"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="social-link bg-primary text-white p-2 rounded-circle"><i class="bi bi-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <hr class="border-light my-4">
+        
+        <!-- Copyright -->
+        <div class="text-center small">
+            <p class="mb-0">&copy; 2025 MyTuition Management system. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Footer Styles -->
+<style>
+    .footer-link {
+        color: #ffd700;
+        text-decoration: none;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .footer-link:hover {
+        color: #ffffff;
+        text-decoration: underline;
+    }
+
+    .social-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: transform 0.3s ease-in-out, background-color 0.3s;
+    }
+
+    .social-link:hover {
+        transform: scale(1.2);
+        opacity: 0.9;
+    }
+</style>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">

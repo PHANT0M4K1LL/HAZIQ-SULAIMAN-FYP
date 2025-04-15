@@ -1,0 +1,15 @@
+<!-- home.html -->
+{% extends 'My_Home/base.html' %}
+
+{% block title %}Home -MyTuition Management System.{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <br>
+    <h1 class="mt-4">Welcome to the MyTuition System.</h1>
+    <p class="text-primary" style="font-size:18px;font-weight:bold;">Integrated dashboard, efficient management modules, and a secure payment management system for lecturers and students.</p>
+    <br><br>
+    <a href="{% url 'SystemUsers' %}" class="btn btn-primary">Get Started</a>
+</div>
+<br><br><br><br><br><br><br>
+{% endblock %}

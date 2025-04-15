@@ -1,0 +1,151 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Questions - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Add New Question</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'Add_Question' %}" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Select Quiz</label>
+                            <select id="quizSelect" name="quiz" class="form-control" required>
+                                <option value="">Select Quiz</option>
+                                {% for quiz_item in quiz %}
+                                    <option value="{{ quiz_item.id }}">{{ quiz_item.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Text</label>
+                            <textarea name="question_text" class="form-control" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Question Type</label>
+                            <select name="question_type" class="form-control" required>
+                                <option value="mcq">Multiple Choice</option>
+                                <option value="tf">True/False</option>
+                                <option value="short">Short Answer</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Option 1</label>
+                            <input type="text" name="option1" class="form-control" value="Default Option 1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Option 2</label>
+                            <input type="text" name="option2" class="form-control" value="Default Option 2" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Option 3</label>
+                            <input type="text" name="option3" class="form-control" value="Default Option 3" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Option 4</label>
+                            <input type="text" name="option4" class="form-control" value="Default Option 4" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Answer</label>
+                            <select name="answer" class="form-control" required>
+                                <option value="Option1">Option 1</option>
+                                <option value="Option2">Option 2</option>
+                                <option value="Option3">Option 3</option>
+                                <option value="Option4">Option 4</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Maximum Score</label>
+                            <input type="number" name="max_score" class="form-control" value="1" required>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success w-50">Add Question</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Questions Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Questions List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover" style="border-collapse: collapse; width: 100%;">
+                            <thead class="table-dark" style="background-color:black;color:white;">
+                                <tr style="background-color:black;color:white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Question Text</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Question Type</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Option 1</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Option 2</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Option 3</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Option 4</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Answer</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Max Score</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color:black;color:white;">
+                                {% for question in questions %}
+                                <tr style="background-color:black;color:white;">
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.question_text1 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.get_question_type_display }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.option1 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.option2 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.option3 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.option4 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.answer }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ question.max_score }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_question' question.id %}" class="btn btn-sm btn-danger" 
+                                        onclick="return confirm('Are you sure you want to delete this Question?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert Messages -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% if messages %}
+    <script>
+        {% for message in messages %}
+            Swal.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        {% endfor %}
+    </script>
+{% endif %}
+{% endblock %}

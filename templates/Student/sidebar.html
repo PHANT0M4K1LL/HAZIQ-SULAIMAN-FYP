@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTuition Management Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons for icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        /* General Body Styling */
+        body {
+            background-color: #121212;
+            color: #e1e1e1;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            height: auto;
+            padding-top: 30px;
+            background-color: rgb(21, 180, 101);
+            position: fixed;
+            width: 250px;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            font-size: 16px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: #34495e;
+            color: #fff;
+        }
+
+        .sidebar-active {
+            background-color: #16a085;
+        }
+
+        /* Toggle Button Styling */
+        #toggleSidebar {
+            color: #e1e1e1;
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        /* Card Styling */
+        .card {
+            border-radius: 10px;
+            background-color: rgb(73, 40, 207);
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            color: #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background-color: #34495e;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #f8f9fa;
+        }
+
+        /* Table Styling */
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            color: #e1e1e1;
+        }
+
+        .table th {
+            background-color: #34495e;
+        }
+
+        /* Chart Styling */
+        .chart-card {
+            background-color: #1c1c1c;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 992px) {
+            #sidebar {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!--========================================================== Main Content===================================================== -->
+<!-- App Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow" style="margin-left:275px; padding: 10px; border-radius:10px;">
+    <div class="container-fluid">
+        <!-- Toggle Button -->
+        <button class="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- App Title -->
+        <a class="navbar-brand mx-3 fw-bold text-white" href="{% url 'student_dashboard' %}">MyTuition</a>
+
+        <!-- Navbar Content (For Responsive Mode) -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <div class="ms-auto d-flex align-items-center text-white">
+                <span class="navbar-text text-white">Welcome, <strong>Student</strong> | <strong id="user-email">{{ user.email }}</strong></span>
+                
+                <!-- Logout Button -->
+                <form action="{% url 'logout' %}" method="post" class="d-inline ms-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!--========================================================== Sidebar Content===================================================== -->
+    <div class="sidebar" id="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; width: 270px; background-color: #343a40;">
+        <div class="sidebar-header text-center py-3">
+            <img src="{% static 'Images/d2.png' %}" alt="Logo" class="img-fluid mb-2" width="120">
+            {% if request.user.is_authenticated %}
+            <h6 class="welcome-text mb-0 text-white" style="font-weight: bold;">Welcome,
+                <span>{{ request.user.get_full_name|default:request.user.username }}</span></h6>
+            {% else %}
+            <div class="welcome-message">
+                <h6 class="welcome-text mb-0 text-white">Welcome, Guest</h6>
+            </div>
+            {% endif %}
+            <hr class="bg-light">
+        </div>
+<!--=====================================================================================================================================-->
+        <ul class="nav flex-column mt-3" id="sidebar-list">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'student_dashboard' %}">
+                    <i class="bi bi-house-door"></i> Dashboard
+                </a>
+            </li>
+            <!-- Student Management -->
+            <li class="nav-item">
+                <a class="nav-link text-white toggle-menu" href="#" data-target="#studentsSubmenu">
+                    <i class="bi bi-person"></i> Student Management
+                </a>
+                <ul class="collapse list-unstyled" id="studentsSubmenu" style="margin-left:30px;">
+                    <li><a class="nav-link text-white ps-4" href="{% url 'StudentAdd_Student' %}">Add New Student</a></li>
+                    <li><a class="nav-link text-white ps-4" href="{% url 'Studentmanage_students' %}">View Students</a></li>
+                    <li><a class="nav-link text-white ps-4" href="{% url 'Studentmanage_submissions' %}">Student Submissions</a></li>
+                    <li><a class="nav-link text-white ps-4" href="{% url 'StudentSubmit_Answer' %}">Quiz Attempts</a></li>
+                </ul>
+            </li>
+             <!-- Enrollments -->
+            <li class="nav-item">
+                <a class="nav-link text-white toggle-menu" href="#" data-target="#enrollmentsSubmenu">
+                    <i class="bi bi-journal"></i> Enrollments Management
+                </a>
+                <ul class="collapse list-unstyled" id="enrollmentsSubmenu" style="margin-left:30px;">
+                    <li><a class="nav-link text-white ps-4" href="{% url 'Studentadd_enrollments' %}">Student Enrollments</a></li>
+                    <li><a class="nav-link text-white ps-4" href="{% url 'Studentmanage_enrollments' %}">Enrollment Progress</a></li>
+                </ul>
+            </li>
+            <!-- Payments -->
+            <li class="nav-item">
+                <a class="nav-link text-white toggle-menu" href="#" data-target="#paymentsSubmenu">
+                    <i class="bi bi-credit-card"></i> Payments Management
+                </a>
+                <ul class="collapse list-unstyled" id="paymentsSubmenu" style="margin-left:30px;">
+                    <li><a class="nav-link text-white ps-4" href="{% url 'studentview_payments' %}">Payment History</a></li>
+                </ul>
+            </li>
+            <!-- Notifications -->
+            <li class="nav-item">
+                <a class="nav-link text-white toggle-menu" href="#" data-target="#notificationsSubmenu">
+                    <i class="bi bi-bell"></i> Notifications Management
+                </a>
+                <ul class="collapse list-unstyled" id="notificationsSubmenu" style="margin-left:30px;">
+                    <li><a class="nav-link text-white ps-4" href="{% url 'studentmanage_notifications' %}">View Notifications</a></li>
+                </ul>
+            </li>
+        </ul>
+<!--=====================================================================================================================================-->
+    </div>
+<!--========================================================== Main Content===================================================== -->
+    <div class="container-fluid">
+        <div class="row" style="margin-left: 250px;">
+            <div class="col-md-4 mt-3">
+                <div class="card">
+                    <div class="card-body" style="text-align:center;">
+                        <i class="bi bi-house-door-fill" style="font-size: 3rem; color: #007bff;"></i>
+                        <h5 class="card-title">No of Enrollment</h5>
+                        <p class="card-text">{{enrollments.count}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3">
+                <div class="card">
+                    <div class="card-body" style="text-align:center;">
+                        <i class="bi bi-person-fill" style="font-size: 3rem; color: #28a745;"></i>
+                        <h5 class="card-title">No of Students</h5>
+                        <p class="card-text">{{students.count}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3" style="text-align:center;">
+                <div class="card">
+                    <div class="card-body">
+                        <i class="bi bi-person-fill" style="font-size: 3rem; color: #dc3545;"></i>
+                        <h5 class="card-title">No of Lecturer</h5>
+                        <p class="card-text">{{lecturers.count}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript for Sidebar Toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".toggle-menu").forEach(function (element) {
+                element.addEventListener("click", function () {
+                    let target = document.querySelector(this.getAttribute("data-target"));
+                    if (target.classList.contains("show")) {
+                        target.classList.remove("show");
+                    } else {
+                        document.querySelectorAll(".collapse").forEach(function (menu) {
+                            menu.classList.remove("show");
+                        });
+                        target.classList.add("show");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

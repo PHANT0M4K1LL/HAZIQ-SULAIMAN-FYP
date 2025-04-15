@@ -1,0 +1,122 @@
+{% extends 'Lecturer/base.html' %}
+{% load static %}
+{% block title %}Manage Assessments - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Add New Assessment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'Lectureradd_assessment' %}" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Course</label>
+                            <select name="course" class="form-control" required>
+                                <option value="">Select Courses</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Max Score</label>
+                            <input type="number" name="max_score" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Due Date</label>
+                            <input type="datetime-local" name="due_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Attachment</label>
+                            <input type="file" name="attachment" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov">
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success w-50">Add Assessment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessments Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Assessments List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover" style="border-collapse: collapse; width: 100%;">
+                            <thead class="table-dark" style="background-color:black;color:white;">
+                                <tr style="background-color:black;color:white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Course</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Title</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Description</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Max Score</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Due Date</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Attachment</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color:black;color:white;">
+                                {% for assessment in assessments %}
+                                <tr style="background-color:black;color:white;">
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.course.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.description }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.max_score }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.due_date }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        {% if assessment.attachment %}
+                                            <a href="{{ assessment.attachment.url }}" class="btn btn-info" target="_blank">Download</a>
+                                        {% else %}
+                                            No Attachment
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert Messages -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% if messages %}
+    <script>
+        {% for message in messages %}
+            Swal.fire({
+                icon: '{{ message.tags }}',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        {% endfor %}
+    </script>
+{% endif %}
+{% endblock %}

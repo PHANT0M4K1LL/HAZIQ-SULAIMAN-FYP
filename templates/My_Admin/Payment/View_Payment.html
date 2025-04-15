@@ -1,0 +1,192 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Payments - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Payment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="payment_form" action="#" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Payment</label>
+                            <select id="paymentSelect" name="payment" class="form-control" required>
+                                <option value="">Select Payment</option>
+                                {% for payment in payments %}
+                                    <option value="{{ payment.id }}">{{ payment.transaction_id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <input type="number" name="amount" class="form-control" required step="0.01">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Payment Date</label>
+                            <input type="datetime-local" name="payment_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Payment Method</label>
+                            <select name="payment_method" class="form-control" required>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="paypal">PayPal</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-control" required>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Attachment</label>
+                            <input type="file" name="attachment" class="form-control">
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Payment</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Payment</button>
+                            <a href="{% url 'view_payments' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Payment List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Transaction ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Amount</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Payment Date</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Payment Method</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Status</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.transaction_id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.amount }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.payment_date }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.payment_method }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.status }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_payment' payment.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this payment?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No payments available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let paymentId = $("#paymentSelect").val();
+
+            if (!paymentId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Payment ID', text: 'Please select a payment before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_payment' %}",
+                type: "GET",
+                data: { payment_id: paymentId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='amount']").val(response.amount);
+                        $("input[name='payment_date']").val(response.payment_date);
+                        $("select[name='payment_method']").val(response.payment_method);
+                        $("select[name='status']").val(response.status);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Payment Not Found', text: 'No records found for the selected payment!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching payment details!' });
+                }
+            });
+        });
+    });
+
+    $("#updateButton").click(function () {
+        let paymentId = $("#paymentSelect").val();
+        let amount = $("input[name='amount']").val().trim();
+        let paymentDate = $("input[name='payment_date']").val().trim();
+        let paymentMethod = $("select[name='payment_method']").val().trim();
+        let status = $("select[name='status']").val().trim();
+
+        if (!paymentId || !amount || !paymentDate || !paymentMethod || !status) {
+            Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'update_payment' %}",
+            type: "POST",
+            data: {
+                payment_id: paymentId,
+                amount: amount,
+                payment_date: paymentDate,
+                payment_method: paymentMethod,
+                status: status,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Payment updated successfully!' }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

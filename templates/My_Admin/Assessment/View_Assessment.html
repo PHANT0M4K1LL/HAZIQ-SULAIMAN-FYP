@@ -1,0 +1,265 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Assessments - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">View All Assessment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="#" enctype="multipart/form-data" novalidate id="updateForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="assessment_id" id="assessment_id"> <!-- Hidden input for assessment ID -->
+
+                        <div class="mb-3">
+                            <label class="form-label">Assessment ID</label>
+                            <select name="assessment_id" class="form-control" id="assessment_select" required>
+                                <option value="">Select Assessment ID</option>
+                                {% for ass in assessments %}
+                                    <option value="{{ ass.id }}">{{ ass.id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Course</label>
+                            <select name="course" class="form-control" required>
+                                <option value="">Select Courses</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Max Score</label>
+                            <input type="number" name="max_score" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Due Date</label>
+                            <input type="datetime-local" name="due_date" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Attachment</label>
+                            <input type="file" name="attachment" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx,.mp4,.avi,.mov">
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Record</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Record</button>
+                            <a href="{% url 'View_Assessment' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assessments Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Assessments List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr style="background-color:blue;color:white;border: 2px solid white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Course</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Title</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Description</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Max Score</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Due Date</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Attachment</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Action</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">View File</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for assessment in assessments %}
+                                <tr style="background-color:black;color:white;border: 2px solid white;">
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.course.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.description }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.max_score }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ assessment.due_date }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        {% if assessment.attachment %}
+                                            <a href="{{ assessment.attachment.url }}" class="btn btn-info" target="_blank">Download</a>
+                                        {% else %}
+                                            No Attachment
+                                        {% endif %}
+                                    </td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_assessment' assessment.id %}" class="btn btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this Assessment?');">
+                                        Delete</a>
+                                    </td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        {% if assessment.attachment %}
+                                            <button class="btn btn-warning" onclick="openModal('{{ assessment.attachment.url }}')">View</button>
+                                        {% else %}
+                                            No File
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Viewing Files -->
+<div id="fileModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View File</h5>
+                <button type="button" class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="fileContent">
+                <!-- File will be displayed here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModal(fileUrl) {
+        let modalContent = document.getElementById("fileContent");
+        let fileExtension = fileUrl.split('.').pop();
+        if (["mp4", "avi", "mov"].includes(fileExtension)) {
+            modalContent.innerHTML = `<video controls width="100%"><source src="${fileUrl}" type="video/${fileExtension}"></video>`;
+        } else {
+            modalContent.innerHTML = `<iframe src="${fileUrl}" width="100%" height="400px"></iframe>`;
+        }
+        document.getElementById("fileModal").style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("fileModal").style.display = "none";
+    }
+
+    // Search functionality
+    document.getElementById("searchButton").addEventListener("click", function () {
+        let assessmentId = document.querySelector("select[name='assessment_id']").value;
+
+        if (!assessmentId) {
+            Swal.fire({
+                icon: "warning",
+                title: "Please select an assessment ID!",
+                text: "You must choose an assessment ID before searching.",
+            });
+            return;
+        }
+
+        fetch(`/get_assessment/${assessmentId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector("select[name='course']").value = data.course_id;
+                    document.querySelector("input[name='title']").value = data.title;
+                    document.querySelector("textarea[name='description']").value = data.description;
+                    document.querySelector("input[name='max_score']").value = data.max_score;
+                    document.querySelector("input[name='due_date']").value = data.due_date;
+                    document.getElementById('assessment_id').value = data.id; // Populate the hidden field
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: "Assessment not found.",
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "There was an issue retrieving the assessment details.",
+                });
+            });
+    });
+
+    // Update functionality
+    document.getElementById("updateButton").addEventListener("click", function () {
+        // Get the form data
+        let formData = new FormData(document.getElementById("updateForm"));
+    
+        // Check if all required fields are filled
+        if (!formData.get("assessment_id")) {
+            Swal.fire('Error', 'Please select an assessment ID.', 'error');
+            return;
+        }
+    
+        if (!formData.get("course") || !formData.get("title") || !formData.get("description") || 
+            !formData.get("max_score") || !formData.get("due_date")) {
+            Swal.fire('Error', 'Please fill in all required fields.', 'error');
+            return;
+        }
+    
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to update this assessment!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Send the form data via AJAX
+                fetch('/update_assessment/', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Success', data.message || 'Assessment updated successfully!', 'success')
+                        .then(() => {
+                            location.reload(); // Reload the page to reflect changes
+                        });
+                    } else {
+                        Swal.fire('Error', data.message || 'Failed to update assessment.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Update Error:', error);
+                    Swal.fire('Error', 'An unexpected error occurred. Please try again.', 'error');
+                });
+            }
+        });
+    });
+    
+</script>
+
+{% endblock %}

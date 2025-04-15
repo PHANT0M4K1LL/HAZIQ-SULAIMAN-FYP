@@ -1,0 +1,193 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Notifications - Learning Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Notification</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="notification_form" action="#" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Notification</label>
+                            <select id="notificationSelect" name="notification" class="form-control" required>
+                                <option value="">Select Notification</option>
+                                {% for note in notifications %}
+                                    <option value="{{ note.id }}">{{ note.message|truncatechars:50 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">User</label>
+                            <select name="user_id" class="form-control" required>
+                                <option value="">Select User</option>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Message</label>
+                            <textarea name="message" class="form-control" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Notification Type</label>
+                            <select name="notification_type" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="quiz_due">Quiz Due</option>
+                                <option value="assignment_due">Assignment Due</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Attachment</label>
+                            <input type="file" name="attachment" class="form-control">
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input type="checkbox" name="read" class="form-check-input" id="readCheckbox">
+                            <label class="form-check-label" for="readCheckbox">Mark as Read</label>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Notification</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Notification</button>
+                            <a href="{% url 'view_notifications' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Notification List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">User</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Message</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Type</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Created At</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Read</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for note in notifications %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.user.username }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.message|truncatechars:500 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.notification_type }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ note.read|yesno:"Yes,No" }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_notification' note.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this notification?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="7" class="text-center">No notifications available.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let notificationId = $("#notificationSelect").val();
+            if (!notificationId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Notification ID', text: 'Please select a notification first.' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_notification' %}",
+                type: "GET",
+                data: { notification_id: notificationId },
+                success: function (response) {
+                    if (response.success) {
+                        $("select[name='user_id']").val(response.user_id);
+                        $("textarea[name='message']").val(response.message);
+                        $("select[name='notification_type']").val(response.notification_type);
+                        $("#readCheckbox").prop('checked', response.read);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Not Found', text: 'Notification not found.' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while fetching the notification.' });
+                }
+            });
+        });
+
+        $("#updateButton").click(function () {
+            let notificationId = $("#notificationSelect").val();
+            let userId = $("select[name='user_id']").val();
+            let message = $("textarea[name='message']").val().trim();
+            let type = $("select[name='notification_type']").val();
+            let read = $("#readCheckbox").is(":checked");
+
+            if (!notificationId || !userId || !message || !type) {
+                Swal.fire({ icon: 'warning', title: 'Incomplete Form', text: 'Please fill out all required fields.' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'update_notification' %}",
+                type: "POST",
+                data: {
+                    notification_id: notificationId,
+                    user_id: userId,
+                    message: message,
+                    notification_type: type,
+                    read: read,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Updated', text: 'Notification updated successfully.' }).then(() => location.reload());
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong.' });
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

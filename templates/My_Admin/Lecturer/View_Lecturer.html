@@ -1,0 +1,187 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Lecturers - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Lecturer</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="lecturer_form" action="#" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Lecturer</label>
+                            <select id="lecturerSelect" name="lecturer" class="form-control" required>
+                                <option value="">Select Lecturer</option>
+                                {% for lecturer in lecturers %}
+                                    <option value="{{ lecturer.id }}">{{ lecturer.lec_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Lecturer Name</label>
+                            <input type="text" name="lec_name" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Specialization</label>
+                            <input type="text" name="lec_specialization" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Department</label>
+                            <input type="text" name="lec_department" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="lec_email" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contact</label>
+                            <input type="text" name="lec_contact" class="form-control" required>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Lecturer</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Lecturer</button>
+                            <a href="{% url 'view_lecturers' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Lecturer Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Lecturer List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Name</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Specialization</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Department</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Email</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Contact</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lecturer in lecturers %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.lec_name }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.lec_specialization }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.lec_department }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.lec_email }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ lecturer.lec_contact }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_lecturer' lecturer.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this lecturer?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No lecturers available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let lecturerId = $("#lecturerSelect").val();
+
+            if (!lecturerId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Lecturer ID', text: 'Please select a lecturer before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_lecturer' %}",
+                type: "GET",
+                data: { lecturer_id: lecturerId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='lec_name']").val(response.lec_name);
+                        $("input[name='lec_specialization']").val(response.lec_specialization);
+                        $("input[name='lec_department']").val(response.lec_department);
+                        $("input[name='lec_email']").val(response.lec_email);
+                        $("input[name='lec_contact']").val(response.lec_contact);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Lecturer Not Found', text: 'No records found for the selected lecturer!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching lecturer details!' });
+                }
+            });
+        });
+    });
+
+    $("#updateButton").click(function () {
+        let lecturerId = $("#lecturerSelect").val();
+        let name = $("input[name='lec_name']").val().trim();
+        let specialization = $("input[name='lec_specialization']").val().trim();
+        let department = $("input[name='lec_department']").val().trim();
+        let email = $("input[name='lec_email']").val().trim();
+        let contact = $("input[name='lec_contact']").val().trim();
+
+        if (!lecturerId || !name || !specialization || !department || !email || !contact) {
+            Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'update_lecturer' %}",
+            type: "POST",
+            data: {
+                lecturer_id: lecturerId,
+                lec_name: name,
+                lec_specialization: specialization,
+                lec_department: department,
+                lec_email: email,
+                lec_contact: contact,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Lecturer updated successfully!' }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

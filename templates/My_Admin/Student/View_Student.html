@@ -1,0 +1,186 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Students - Learning Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Students</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="student_form" action="#" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Student</label>
+                            <select id="studentSelect" name="student" class="form-control" required>
+                                <option value="">Select Student</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}">{{ student.student_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Student Name</label>
+                            <input type="text" name="student_name" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" name="student_rollno" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Course</label>
+                            <input type="text" name="student_course" class="form-control" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Classroom</label>
+                            <input type="text" name="class_room" class="form-control" required>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Student</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Student</button>
+                            <a href="{% url 'manage_students' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Student List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr style="background-color:blue;color:white;border: 2px solid white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Name</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Roll No</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Course</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Classroom</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ student.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ student.student_name }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ student.student_rollno }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ student.student_course.title }}</td> <!-- Course title -->
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ student.class_room.room_number }}</td> <!-- Assuming 'name' is a field in ClassRoom model -->
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_student' student.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this student?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No students available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Handle the search button click to fetch and populate the student data
+        $("#searchButton").click(function () {
+            let studentId = $("#studentSelect").val();
+
+            if (!studentId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Student ID', text: 'Please select a student before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_student' %}",
+                type: "GET",
+                data: { student_id: studentId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='student_name']").val(response.student_name);
+                        $("input[name='student_rollno']").val(response.student_rollno);
+                        $("input[name='student_course']").val(response.student_course);
+                        $("input[name='class_room']").val(response.class_room);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Student Not Found', text: 'No records found for the selected student!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching student details!' });
+                }
+            });
+        });
+
+        // Handle the update button click to send updated student data
+        $("#updateButton").click(function () {
+            let studentId = $("#studentSelect").val();
+            let name = $("input[name='student_name']").val().trim();
+            let rollno = $("input[name='student_rollno']").val().trim();
+            let course = $("input[name='student_course']").val().trim();
+            let classroom = $("input[name='class_room']").val().trim();
+
+            // Check if all required fields are filled
+            if (!studentId || !name || !rollno || !course || !classroom) {
+                Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+                return;
+            }
+
+            // Send data to update the student record
+            $.ajax({
+                url: "{% url 'update_student' %}",
+                type: "POST",
+                data: {
+                    student_id: studentId,
+                    student_name: name,
+                    student_rollno: rollno,
+                    student_course: course,
+                    class_room: classroom,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Student updated successfully!' }).then(() => location.reload());
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while updating student details!' });
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

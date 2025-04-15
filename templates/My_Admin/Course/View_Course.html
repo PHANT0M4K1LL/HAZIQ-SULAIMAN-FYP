@@ -1,0 +1,187 @@
+{% extends 'My_Admin/base.html' %}
+{% load static %}
+{% block title %}Manage Courses - Learning Management System{% endblock %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Manage Course</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="course_form" action="#" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Course</label>
+                            <select id="courseSelect" name="course" class="form-control" required>
+                                <option value="">Select Course</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}">{{ course.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Course Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Instructor</label>
+                            <select id="instructorSelect" name="instructor" class="form-control" required>
+                                <option value="">Select Instructor</option>
+                                {% for instructor in instructors %}
+                                    <option value="{{ instructor.id }}">{{ instructor.lec_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" step="0.01" name="price" class="form-control" required>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-success" id="searchButton" style="width:200px;">Search Course</button>
+                            <button type="button" class="btn btn-primary" id="updateButton" style="width:200px;">Update Course</button>
+                            <a href="{% url 'View_Course' %}" class="btn btn-secondary" style="width:200px;">Refresh</a>
+                            <button type="reset" class="btn btn-danger" style="width:200px;">
+                                <i class="bi bi-x-circle me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Course List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr style="background-color:blue;color:white;border: 2px solid white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Title</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Description</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Instructor</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Price</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Created At</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ course.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ course.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ course.description }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ course.instructor.lec_name }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">${{ course.price|floatformat:2 }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ course.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">
+                                        <a href="{% url 'delete_course' course.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this course?');">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No courses available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let courseId = $("#courseSelect").val();
+
+            if (!courseId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Course ID', text: 'Please select a course before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_course' %}",
+                type: "GET",
+                data: { course_id: courseId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='title']").val(response.title);
+                        $("#instructorSelect").val(response.instructor_id);
+                        $("textarea[name='description']").val(response.description);
+                        $("input[name='price']").val(response.price);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Course Not Found', text: 'No records found for the selected course!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching course details!' });
+                }
+            });
+        });
+    });
+
+    $("#updateButton").click(function () {
+        let courseId = $("#courseSelect").val();
+        let title = $("input[name='title']").val().trim();
+        let instructorId = $("#instructorSelect").val();
+        let description = $("textarea[name='description']").val().trim();
+        let price = $("input[name='price']").val();
+
+        if (!courseId || !title || !instructorId || !description || !price) {
+            Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'update_course' %}",
+            type: "POST",
+            data: {
+                course_id: courseId,
+                title: title,
+                instructor_id: instructorId,
+                description: description,
+                price: price,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Course updated successfully!' }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                }
+            }
+        });
+    });
+</script>
+
+{% endblock %}

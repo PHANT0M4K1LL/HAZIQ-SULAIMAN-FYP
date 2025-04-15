@@ -1,0 +1,162 @@
+{% extends 'Lecturer/base.html' %}
+{% load static %}
+{% block title %}Home-Page-University LMS Management System{% endblock %}
+
+{% block content %}
+<br>
+<div class="container mt-12" style="width:2000px;">
+  <div class="row" style="margin-left:145px;width:1080px;">
+
+    <!-- Card: Total Students -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow" style="background-color:rgba(10, 10, 10, 0.7);border:2px solid white;">
+        <div class="card-header" style="background-color:rgba(43, 177, 110, 0.7);">
+          <h3 style="font-weight:bold;text-align:center;">Total Students</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="studentsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Total Lecturers -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow" style="background-color:rgba(10, 10, 10, 0.7);border:2px solid white;">
+        <div class="card-header" style="background-color:rgba(51, 32, 224, 0.7);">
+          <h3 style="font-weight:bold;text-align:center;">Total Lecturers</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="lecturersChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Total Enrollments -->
+    <div class="col-12 mb-4">
+      <div class="card shadow" style="background-color:rgba(10, 10, 10, 0.7);border:2px solid white;">
+        <div class="card-header" style="background-color:rgba(234, 170, 0, 0.7);">
+          <h3 style="font-weight:bold;text-align:center;">Total Enrollments</h3>
+        </div>
+        <div class="card-body">
+          <canvas id="enrollmentsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Registration Table -->
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header">
+          <h3>Registered Students</h3>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped table-bordered">
+            <thead>
+              <tr style="background-color:blue;color:white;">
+                <th style="background-color:blue;color:white;border: 2px solid white;">#</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Name</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Email</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Role</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Status</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Date Joined</th>
+                <th style="background-color:blue;color:white;border: 2px solid white;">Last Login</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr style="background-color:black;color:white;border:2px solid white;">
+                <td style="border: 2px solid white;">{{ forloop.counter }}</td>
+                <td style="border: 2px solid white;">{{ user.username }}</td>
+                <td style="border: 2px solid white;">{{ user.email }}</td>
+                <td style="border: 2px solid white;">Lecturer</td>
+                <td style="border: 2px solid white;">
+                  {% if user.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                  {% endif %}
+                </td>
+                <td style="border: 2px solid white;">{{ user.date_joined|date:"Y-m-d H:i" }}</td>
+                <td style="border: 2px solid white;">
+                  {% if user.last_login %}
+                    {{ user.last_login|date:"Y-m-d H:i" }}
+                  {% else %}
+                    Never
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr style="background-color:black;color:white;border:2px solid white;">
+                <td colspan="7" class="text-center" style="border:2px solid white;">No student users found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const totalStudents = {{ total_students }};
+  const totalLecturers = {{ total_lecturers }};
+  const totalEnrollments = {{ total_enrollments }};
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false
+  };
+
+  new Chart(document.getElementById('studentsChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Total Students'],
+      datasets: [{
+        label: 'Total Students',
+        data: [totalStudents],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: chartOptions
+  });
+
+  new Chart(document.getElementById('lecturersChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Total Lecturers'],
+      datasets: [{
+        label: 'Total Lecturers',
+        data: [totalLecturers],
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: chartOptions
+  });
+
+  new Chart(document.getElementById('enrollmentsChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: ['Total Enrollments'],
+      datasets: [{
+        label: 'Total Enrollments',
+        data: [totalEnrollments],
+        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+        borderColor: 'rgba(255, 206, 86, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: chartOptions
+  });
+</script>
+
+<!-- Bootstrap Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

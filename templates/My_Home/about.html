@@ -1,0 +1,108 @@
+{% extends 'My_Home/base.html' %}
+{% load static %}
+{% block title %}About Us - University LMS Management System{% endblock %}
+{% block content %}
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade {
+    animation: fadeInUp 1s ease-in-out;
+  }
+
+  .card-custom {
+    background-color: #2C3E50;
+    color: white;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  }
+
+  .card-custom:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.2);
+  }
+</style>
+
+<div class="container mx-auto px-6 py-12">
+  <div class="text-center animate-fade">
+    <h1 class="text-4xl font-bold text-gray-800">About Us</h1>
+    <p class="mt-3 text-gray-600 text-lg">AI-Powered Exam Creation, Automated Grading, and Secure Assessment</p>
+  </div>
+
+  <!-- Platform Features Section -->
+  <div class="mt-16">
+    <h2 class="text-center text-3xl font-bold text-gray-800 animate-fade">Key Features of University LMS Management System</h2>
+    <div class="mt-8 row row-cols-1 row-cols-md-3 g-4">
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/exam_creation.jpg' %}" class="card-img-top" alt="Exam Creation">
+          <div class="card-body text-center">
+            <h5 class="card-title mt-3">AI-Driven Exam Creation</h5>
+            <p class="card-text">Create exams manually or upload PDFs, with an intelligent question bank for streamlined test design.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/automated_grading.jpg' %}" class="card-img-top" alt="Automated Grading">
+          <div class="card-body text-center">
+            <h5 class="card-title mt-3">Automated Grading</h5>
+            <p class="card-text">Instant grading with AI-powered assessment, saving time and ensuring accuracy in evaluation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/security.jpg' %}" class="card-img-top" alt="Security Features">
+          <div class="card-body text-center">
+            <h5 class="card-title mt-3">Secure Assessment</h5>
+            <p class="card-text">Ensures a safe examination environment with advanced security measures and student authentication.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Section -->
+  <div class="mt-16">
+    <h2 class="text-center text-3xl font-bold text-gray-800 animate-fade">Meet Our Team</h2>
+    <div class="mt-8 row row-cols-1 row-cols-md-3 g-4">
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/dev1.jpg' %}" class="card-img-top" alt="Developer 1">
+          <div class="card-body text-center">
+            <h5 class="card-title">Alex Carter</h5>
+            <p class="card-text">Lead Developer - AI, Machine Learning, and Security</p>
+          </div>
+        </div>
+      </div>
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/dev2.jpg' %}" class="card-img-top" alt="Developer 2">
+          <div class="card-body text-center">
+            <h5 class="card-title">Emma Johnson</h5>
+            <p class="card-text">UI/UX Designer - Frontend, User Experience, and Accessibility</p>
+          </div>
+        </div>
+      </div>
+      <div class="col animate-fade">
+        <div class="card card-custom h-100 shadow-lg border-0">
+          <img src="{% static 'Images/dev3.jpg' %}" class="card-img-top" alt="Developer 3">
+          <div class="card-body text-center">
+            <h5 class="card-title">James Lee</h5>
+            <p class="card-text">Backend Engineer - API Development, Database Management</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<br><br>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'Student/base.html' %}
+{% load static %}
+{% block title %}Manage Payments - MyTuition Management System{% endblock %}
+{% block content %}
+<!-- Payment Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Payment List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Transaction ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Amount</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Payment Date</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Payment Method</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.transaction_id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.amount }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.payment_date }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.payment_method }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ payment.status }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No payments available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let paymentId = $("#paymentSelect").val();
+
+            if (!paymentId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Payment ID', text: 'Please select a payment before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_payment' %}",
+                type: "GET",
+                data: { payment_id: paymentId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='amount']").val(response.amount);
+                        $("input[name='payment_date']").val(response.payment_date);
+                        $("select[name='payment_method']").val(response.payment_method);
+                        $("select[name='status']").val(response.status);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Payment Not Found', text: 'No records found for the selected payment!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching payment details!' });
+                }
+            });
+        });
+    });
+
+    $("#updateButton").click(function () {
+        let paymentId = $("#paymentSelect").val();
+        let amount = $("input[name='amount']").val().trim();
+        let paymentDate = $("input[name='payment_date']").val().trim();
+        let paymentMethod = $("select[name='payment_method']").val().trim();
+        let status = $("select[name='status']").val().trim();
+
+        if (!paymentId || !amount || !paymentDate || !paymentMethod || !status) {
+            Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+            return;
+        }
+
+        $.ajax({
+            url: "{% url 'update_payment' %}",
+            type: "POST",
+            data: {
+                payment_id: paymentId,
+                amount: amount,
+                payment_date: paymentDate,
+                payment_method: paymentMethod,
+                status: status,
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Payment updated successfully!' }).then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

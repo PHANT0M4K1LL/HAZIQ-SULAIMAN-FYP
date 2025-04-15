@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTuition System</title>
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Modern Navbar */
+        .navbar {
+            background: linear-gradient(135deg,rgb(214, 137, 22),rgb(54, 11, 248));
+            padding: 15px 20px;
+            transition: all 0.3s ease-in-out;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #ffffff !important;
+        }
+        .navbar-nav .nav-link {
+            font-size: 1.1rem;
+            color: #ffffff !important;
+            margin-right: 15px;
+            transition: all 0.3s ease-in-out;
+        }
+        .navbar-nav .nav-link:hover {
+            color:rgb(71, 19, 194) !important;
+            transform: scale(1.1);
+            text-decoration: underline;
+        }
+        
+        /* Slideshow Styling */
+        .carousel-inner img {
+            height: 500px;
+            object-fit: cover;
+        }
+        .carousel-caption {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            width: 100%;
+            color:rgb(10, 14, 241);
+            font-size: 2rem;
+            font-weight: bold;
+            animation: fadeInUp 2s;
+        }
+        
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'Home' %}">MyTuition</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'About_Us' %}">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Services' %}">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'Contact_Us' %}">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'SystemUsers' %}">System Users</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Slideshow -->
+    <div id="carouselExampleIndicators" class="carousel slide mt-5">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'Sliders/slider1.jpg' %}" class="d-block w-100" alt="Slide 1">
+                <div class="carousel-caption">Empowering Tuition Centers with Seamless Learning Management.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider2.jpg' %}" class="d-block w-100" alt="Slide 2">
+                <div class="carousel-caption">Learn Smarter, Manage Better, Pay Easier.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider3.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Your Gateway to Efficient Tuition Management.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider4.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Simplifying Learning, One Click at a Time.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider5.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Where Education Meets Innovation.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider6.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Interactive lessons, quizzes, and assignments.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider7.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Streamline Your Tuition Experience Today.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider8.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Sell courses and monetize your expertise.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider9.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Transforming Tuition Centers with Technology.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider10.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Upgrade skills and stay competitive.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider11.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Secure, Smart, and Simple Learning Management.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider12.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Engaging video lectures, assignments, and live sessions.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider13.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Earn verified certificates to showcase skills.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider14.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Affordable, high-quality learning for all.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider15.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption"> Revolutionizing How You Learn and Manage.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider16.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">Enroll today and achieve your dreams.</div>
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'Sliders/slider17.jpg' %}" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption">All-in-one platform for courses and progress tracking.</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            document.querySelector('.navbar').classList.toggle('bg-dark');
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('text-light');
+            });
+        }
+
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.carousel-item');
+        setInterval(() => {
+            slides[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % slides.length;
+            slides[currentIndex].classList.add('active');
+        }, 5000);
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+

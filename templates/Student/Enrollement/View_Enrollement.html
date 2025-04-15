@@ -1,0 +1,111 @@
+{% extends 'Student/base.html' %}
+{% load static %}
+{% block title %}Manage Enrollments - Mytuition Management System{% endblock %}
+{% block content %}
+<!-- Enrollment Progress Summary -->
+<!-- Enrollment Table -->
+<div class="container mt-4">
+    <div class="row" style="margin-left:150px;width:1300px;">
+        <div class="col-lg-10 col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">Enrollment List</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive" style="max-height: 400px;">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr style="background-color:blue;color:white;border: 2px solid white;">
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">ID</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Student</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Course</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Progress (%)</th>
+                                    <th style="background-color:blue;color:white;border: 2px solid white;">Enrolled On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrollments %}
+                                <tr style="background-color:black;color:white;border: 2px solid white;">
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ enrollment.id }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ enrollment.student.student_name }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ enrollment.course.title }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ enrollment.progress }}</td>
+                                    <td style="background-color:black;color:white;border: 2px solid white;">{{ enrollment.enrolled_on }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center" style="background-color:black;color:white;border: 2px solid white;">No enrollments available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and SweetAlert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#searchButton").click(function () {
+            let studentId = $("#studentSelect").val();
+            let courseId = $("#courseSelect").val();
+
+            if (!studentId || !courseId) {
+                Swal.fire({ icon: 'warning', title: 'Missing Data', text: 'Please select a student and course before searching!' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'search_enrollment' %}",
+                type: "GET",
+                data: { student_id: studentId, course_id: courseId },
+                success: function (response) {
+                    if (response.success) {
+                        $("input[name='progress']").val(response.progress);
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Enrollment Not Found', text: 'No records found for the selected student and course!' });
+                    }
+                },
+                error: function () {
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while fetching enrollment details!' });
+                }
+            });
+        });
+
+        $("#updateButton").click(function () {
+            let studentId = $("#studentSelect").val();
+            let courseId = $("#courseSelect").val();
+            let progress = $("input[name='progress']").val().trim();
+
+            if (!studentId || !courseId || !progress) {
+                Swal.fire({ icon: 'warning', title: 'Incomplete Data', text: 'Please enter all required fields to update.' });
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'update_enrollment' %}",
+                type: "POST",
+                data: {
+                    student_id: studentId,
+                    course_id: courseId,
+                    progress: progress,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({ icon: 'success', title: 'Updated Successfully', text: 'Enrollment updated successfully!' }).then(() => location.reload());
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Update Failed', text: response.message || 'Something went wrong!' });
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

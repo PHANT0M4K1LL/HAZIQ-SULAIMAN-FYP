@@ -1,0 +1,147 @@
+{% extends 'My_Home/base.html' %}
+{% load static %}
+{% block title %}Contact Us - University LMS Management System{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header text-white text-center rounded-top-4" 
+                    style="background: linear-gradient(135deg, #007bff, #6610f2);">
+                    <h4 class="mb-0">Contact Us</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form id="contactForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">Name</label>
+                            <input type="text" class="form-control shadow-sm" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control shadow-sm" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label fw-semibold">Feedback</label>
+                            <input type="text" class="form-control shadow-sm" id="feedback" name="feedback" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label fw-semibold">Message</label>
+                            <textarea class="form-control shadow-sm" id="message" name="message" rows="4" required></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-semibold py-2 shadow-sm"
+                                style="transition: 0.3s ease;">
+                                Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+
+<!-- Optional Custom Styling -->
+<style>
+    body {
+        background-color: rgb(255, 255, 255);
+    }
+    .btn-primary:hover {
+        background-color: #0056b3 !important;
+        transform: translateY(-2px);
+    }
+    .form-control:focus {
+        border-color: #6610f2;
+        box-shadow: 0 0 8px rgba(102, 16, 242, 0.2);
+    }
+</style>
+<!-- Include SweetAlert Library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- JavaScript for Form Validation -->
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Get form fields
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const subject = document.getElementById('feedback').value.trim();
+        const message = document.getElementById('message').value.trim();
+
+        // Regular Expression for email validation
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        // Array to store missing fields
+        let missingFields = [];
+        let invalidEmail = false;
+
+        // Check if required fields are empty
+        if (!name) missingFields.push('Full Name');
+        if (!email) missingFields.push('Email Address');
+        if (!subject) missingFields.push('Feedback');
+        if (!message) missingFields.push('Message');
+
+        // Check if email format is invalid
+        if (email && !emailRegex.test(email)) {
+            invalidEmail = true;
+            missingFields.push('Invalid Email Address');
+        }
+
+        if (missingFields.length > 0) {
+            // Show alert for missing or invalid fields
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing or Invalid Information',
+                html: `<p>Please enter valid data in the following field(s):</p><ul>${missingFields.map(field => `<li>${field}</li>`).join('')}</ul>`
+            });
+            return;
+        }
+
+        // Get CSRF token
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // If all fields are valid, proceed with the fetch request
+        const formData = new FormData(this);
+
+        fetch("{% url 'Contact_Us' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": csrfToken // Pass CSRF token correctly
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success alert
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Message Sent!',
+                    text: data.message
+                });
+
+                // Clear form fields
+                document.getElementById('contactForm').reset();
+            } else {
+                // Handle error if needed
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong. Please try again!'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An unexpected error occurred. Please try again later!'
+            });
+        });
+    });
+</script>
+
+{% endblock %}
